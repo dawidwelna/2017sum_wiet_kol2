@@ -17,60 +17,129 @@
 
 
 import math
+import json
 
 
-class Student:
-	
-	def __init__(self, name, surname, id):
-		self.name = name
-		self.surname = surname
-		self.id = id
-	
-	def create_student(self, name, surname, id):
-		self.name = name
-		self.surname = surname
-		self.id = id
 
-	def speak(self):
-		print "Hello! I am {} {}, my id number is {}".format(self.name, self.surname, self.id)
-		
-		
+class Diary(object):
+	def __init__(self):
+		with open('json_file.json') as data_file:
+			data_json = json.load(data_file)
+		self.data = data_json
+	
+	def get_total_avg_score(self): 
 
-class Subject(Student):
+		for i in range(3):
+			grade = 0
+			counter = 0
+			for j in range(3):
+				for k in range(5):
+					if diary.data['student'][i]['subject'][j]['grades'][k] != 0:
+						grade += diary.data['student'][i]['subject'][j]['grades'][k]
+						counter += 1
+			if counter == 0: 
+				counter = 1
+			print "Student " + 	str(diary.data['student'][i]['firstName']),
+			print " avg total grade is " + str(float(grade)/float(counter))
+				
 	
-	def __init__(self, subject_name, teacher):
-		self.subject_name = subject_name
-		self.teacher = teacher
+	def get_class_avg_score(self): 
 		
-	def speak(self):
-		print "This subject is called {}".format(self.subject_name)
+		for i in range(3):
+			grade = 0
+			counter = 0
+			for j in range(3):
+				for k in range(5):
+					if diary.data['student'][i]['subject'][j]['grades'][k] != 0:
+						grade += diary.data['student'][i]['subject'][j]['grades'][k]
+						counter += 1
+				if counter == 0: 
+					counter = 1
+				print "Student " + 	diary.data['student'][i]['firstName'] + ' subject: ', 
+				print diary.data['student'][i]['subject'][j]['name'] + " avg class grade is " + str(grade/counter)
+		
+	
 
-		
-class Grades(Subject):
+def menu():
+	while True:
 	
-	attendance = 0
-	total_attendance = 14
+		print "\nOptions: \n" + "%s\n%s\n%s\n%s\n%s\n%s\n%s" % (
+			'1. Grade student.',
+			'2. Check attendance.',
+			"3. Show students average total grade",
+			"4. Show students average class score",
+			"5. Print out School's current state",
+			"6. Save changes.",
+			"9. Exit."
+		) 
+		try:
+			x = int(raw_input("\nEnter a number: "))	
+		except ValueError:
+			x = 5
+			print "Oops! That was no valid number. Try again..."
+			
+		if x==9:
+			break
+		elif x==1:
+			while True:
+				print "\nChoose a student from list below" 
+				for i in range(3):
+					print str(i + 1) + ' ' + diary.data['student'][i]['firstName'] + ' ',
+				try:
+					y = input("\nEnter a number: ")
+					if 0<y<4:
+						break
+					print "The number out of range. Try again.."
+				except ValueError:
+					print "Oops! That was no valid number. Try again..."
+				
+			while True:	
+				print "\nChoose a subject from list below" 
+				for i in range(3):
+					print str(i + 1) + ' ' + diary.data['student'][y-1]['subject'][i]['name'] + ' ',
+				try:
+					z = input("\nEnter a number: ")
+					if 0<z<4:
+						break
+					print "The number out of range. Try again.."
+				except ValueError:
+					print "Oops! That was no valid number. Try again..."
+				
+			attendance = diary.data['student'][y-1]['subject'][z-1]['attendance']
+			print "\nGive student the grade he deserves (range 2-5)>> "
+			
+			while True:
+				try:
+					grade = input()
+					if 1<grade<6:
+						break
+					print "The number out of range. Try again.."
+				except ValueError:
+					print "Oops! That was no valid number. Try again..."
+			
+			
+			diary.data['student'][y-1]['subject'][z-1]['grades'][attendance] = grade
+			diary.data['student'][y-1]['subject'][z-1]['attendance'] += 1
+		elif x==2:
+			print "The student was present on " + str(diary.data['student'][y-1]['subject'][z-1]['attendance'])
+		elif x==3:
+			diary.get_total_avg_score()	
+		elif x==4:
+			diary.get_class_avg_score()
+		elif x==5:
+			print json.dumps(diary.data)
+		elif x==6:
+			with open('data.txt', 'w') as outfile:
+				json.dump(diary.data, outfile)
+		else:
+			print "Error occurred. Please choose the correct option"
 	
-	def __init__(self, grade, lesson_number):
-		self.lesson_number = lesson_number
-		self.grade = grade
-	
-	def addGrade(self, grade, lesson_number):
-		self.lesson_number = lesson_number
-		self.grade = grade
-		
-	def count_attendance(self):
-		self.attendance = self.attendance + 1
-		
-		
-		
-		
-def main():
-	s1 = Student('Andrzej', 'Rdad', 1)
-	s1.speak()
 
-	sub1 = Subject('Literature', 'Arthur C. Doyle')
-	sub1.speak()
+	
+if __name__ == "__main__":
+	
+	diary = Diary()		
+	menu()
+
 	
 	
-main()
